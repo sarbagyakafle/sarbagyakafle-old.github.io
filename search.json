@@ -2,12 +2,16 @@
 layout: null
 ---
 [
-  {% for post in site.posts %}
-    {
-      "title"    : "{{ post.title | escape }}",
-      "category" : "{{ post.category | escape }}",
-      "url"      : "{{ post.url | relative_url }}",
-      "content"  : "{{ post.content | strip_html | strip_newlines | escape }}"
-    } {% unless forloop.last %},{% endunless %}
-  {% endfor %}
+{% assign items = site.posts | concat: site.html_pages %}
+{% for item in items %}
+{% unless item.title == "404 - Page not found" or item.title == nil %}
+{
+  "title": {{ item.title | strip_html | jsonify }},
+  "desc": {{ item.excerpt | strip_html | truncate: 160 | jsonify }},
+  "category": {{ item.tags | default: "page" | jsonify }},
+  "url": {{ item.url | relative_url | jsonify }},
+  "date": {{ item.date | default: "1970-01-01" | date: "%B %e, %Y" | jsonify }}
+}{% unless forloop.last %},{% endunless %}
+{% endunless %}
+{% endfor %}
 ]
